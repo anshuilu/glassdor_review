@@ -1,0 +1,83 @@
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+import numpy as np
+headers={'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win 64 ; x64) Apple WeKit /537.36(KHTML , like Gecko) Chrome/80.0.3987.162 Safari/537.36'}
+final=pd.DataFrame()
+for j in range(1,3):
+  webpage=requests.get('https://www.glassdoor.co.in/Reviews/index.htm?overall_rating_low=3.5&page={}&filterType=RATING_OVERALL'.format(j),headers=headers).text
+  soup=BeautifulSoup(webpage,'lxml')
+  company=soup.find_all('div',class_='row d-flex flex-wrap')
+  name=[]
+  rating=[]
+  reviews=[]
+  location=[]
+  company_size=[]
+  industry_type=[]
+  salaries=[]
+  jobs=[]
+
+  for i in company:
+    try:
+      name.append(i.find('h2').text.strip())
+      #print(i.find('h2').text.strip())
+    except:
+      name.append(np.nan)
+
+    try:
+      rating.append(i.find('b').text.strip())
+    except:
+      rating.append(np.nan)
+
+    try:
+      #reviews.append(i.find('a' , class_='review-count').text.strip())
+      location = i.find('div',class_ ='col-lg-4 mt-xsm mt-sm-std order-2')
+      #print(location.find('a').text.strip())
+      location.append(i.find('a').text.strip())
+    except:
+      location.append(np.nan)
+
+    try:
+      size = i.find('div',class_ ='col-lg-4 mt-sm mt-sm-std order-3')
+      #print(size.find('span',class_= 'd-block mt-0 css-56kyx5').text.strip())
+      company_size.append(size.find('span',class_= 'd-block mt-0 css-56kyx5').text.strip())
+    except:
+      company_size.append(np.nan)
+
+    try:
+      industry = i.find('div',class_ ='col-lg-4 mt-sm mt-sm-std order-4')
+      #print(industry.find('span',class_= 'd-block mt-0 css-56kyx5').text.strip())
+      industry_type.append(industry.find('span',class_= 'd-block mt-0 css-56kyx5').text.strip())
+    except:
+      industry_type.append(np.nan)
+
+    try:
+      all =  i.find('div',class_ ="col-12 col-lg-4 mt-lg-0 mt-std d-flex justify-content-between order-6 order-lg-1")
+      lst = all.find_all('h3')
+      reviews.append(lst[0].text)
+    except:
+      reviews.append(np.nan)
+
+    try:
+      all =  i.find('div',class_ ="col-12 col-lg-4 mt-lg-0 mt-std d-flex justify-content-between order-6 order-lg-1")
+      lst = all.find_all('h3')
+      salaries.append(lst[1].text)
+    except:
+      salaries.append(np.nan)
+    try:
+      all =  i.find('div',class_ ="col-12 col-lg-4 mt-lg-0 mt-std d-flex justify-content-between order-6 order-lg-1")
+      lst = all.find_all('h3')
+      jobs.append(lst[2].text)
+    except:
+      jobs.append(np.nan)
+  df=pd.DataFrame({
+  'name':name,
+  'rating':rating,
+  'Location':'location',
+  'Global Company Size':company_size,
+  'Industry':industry_type,
+  'Total_reviews':reviews,
+  'Total_Salary_review':salaries,
+  'Total_Jobs_reviews':jobs })
+  final = pd.concat([final, df], ignore_index=True)
+
