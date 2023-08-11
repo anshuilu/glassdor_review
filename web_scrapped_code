@@ -4,7 +4,8 @@ from bs4 import BeautifulSoup
 import numpy as np
 headers={'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win 64 ; x64) Apple WeKit /537.36(KHTML , like Gecko) Chrome/80.0.3987.162 Safari/537.36'}
 final=pd.DataFrame()
-for j in range(1,3):
+#n=len(total_company_size)
+for j in range(1,1000):
   webpage=requests.get('https://www.glassdoor.co.in/Reviews/index.htm?overall_rating_low=3.5&page={}&filterType=RATING_OVERALL'.format(j),headers=headers).text
   soup=BeautifulSoup(webpage,'lxml')
   company=soup.find_all('div',class_='row d-flex flex-wrap')
